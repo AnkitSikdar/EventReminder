@@ -1,0 +1,58 @@
+<h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Event</h2>
+
+<form action="/events/<%= event._id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="space-y-4">
+
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">Title</label>
+    <input type="text" name="title" value="<%= event.title %>" required
+      class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
+
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">Description</label>
+    <textarea name="description" required
+      class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"><%= event.description %></textarea>
+  </div>
+
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">Start At</label>
+    <input type="datetime-local" name="startAt" required
+      value="<%= event.startAt ? new Date(event.startAt).toISOString().slice(0,16) : '' %>"
+      class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
+
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">End At</label>
+    <input type="datetime-local" name="endAt" required
+      value="<%= event.endAt ? new Date(event.endAt).toISOString().slice(0,16) : '' %>"
+      class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
+
+  <% if (event.image) { %>
+    <p class="text-gray-600 mb-2">Current Image:</p>
+    <img src="/uploads/images/<%= event.image %>" alt="Event Image" class="mb-3 w-48 rounded">
+  <% } %>
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">Upload New Image</label>
+    <input type="file" name="image"
+      class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
+
+  <% if (event.video) { %>
+    <p class="text-gray-600 mb-2">Current Video:</p>
+    <video controls class="mb-3 w-full rounded">
+      <source src="/uploads/videos/<%= event.video %>" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  <% } %>
+  <div>
+    <label class="block text-gray-700 font-medium mb-1">Upload New Video</label>
+    <input type="file" name="video"
+      class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
+
+  <button type="submit"
+    class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded mt-2">
+    Update Event
+  </button>
+</form>

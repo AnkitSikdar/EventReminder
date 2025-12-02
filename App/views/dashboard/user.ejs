@@ -1,0 +1,115 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h2 class="text-3xl font-bold mb-4 text-gray-800 text-center">Welcome, <%= user.name %>!</h2>
+  <h4 class="text-xl font-semibold mb-6 text-gray-700 text-center">All Events</h4>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-2 sm:p-4">
+    <% events.forEach(event => { %>
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-gray-200 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+
+        <!-- Event Image -->
+        <% if(event.image){ %>
+          <div class="relative group">
+            <img src="/uploads/images/<%= event.image %>" 
+                 alt="<%= event.title %>" 
+                 class="w-full h-56 object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
+                 onclick="openModal('/uploads/images/<%= event.image %>')">
+            <span class="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded hidden group-hover:block">
+              View Image
+            </span>
+          </div>
+        <% } else { %>
+          <div class="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">
+            No Media
+          </div>
+        <% } %>
+
+        <!-- Event Content -->
+        <div class="p-4 flex flex-col flex-1">
+          <h3 class="text-xl font-bold mb-2 text-gray-900"><%= event.title %></h3>
+
+          <!-- Description -->
+          <p class="text-gray-600 mb-2 flex-1 text-sm line-clamp-3" id="desc-<%= event._id %>">
+            <%= event.description %>
+          </p>
+
+          <% if(event.video){ %>
+            <!-- Read More Button -->
+            <button type="button" 
+                    class="text-blue-600 text-xs hover:underline self-start mb-2"
+                    onclick="toggleVideo('<%= event._id %>')">Read More</button>
+
+            <!-- Video Hidden Initially -->
+            <div id="video-<%= event._id %>" class="hidden mb-4 transition-all duration-300">
+              <video src="/uploads/videos/<%= event.video %>" controls class="w-full h-48 object-cover rounded-lg shadow-md"></video>
+            </div>
+          <% } %>
+
+          <!-- Event Timing -->
+          <p class="text-sm text-gray-500 mb-1"><strong>Start:</strong> <%= new Date(event.startAt).toLocaleString() %></p>
+          <p class="text-sm text-gray-500 mb-4"><strong>End:</strong> <%= new Date(event.endAt).toLocaleString() %></p>
+
+          <!-- Interested Button -->
+          <form action="/events/<%= event._id %>/interested" method="POST"
+                onsubmit="this.querySelector('button').innerText='Submitting...';">
+            <button type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg w-full transition-all duration-300 shadow-md">
+              Interested
+            </button>
+          </form>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
+
+<!-- Full Image Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50 p-4">
+  <span class="absolute top-6 right-8 text-white text-4xl cursor-pointer hover:text-gray-300 transition-colors" onclick="closeModal()">&times;</span>
+  <img id="modalImage" src="" class="max-h-[80vh] max-w-[90vw] rounded-lg shadow-2xl border-4 border-white transition-transform duration-300">
+</div>
+
+<script>
+  // Modal
+  function openModal(src) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    modal.classList.remove("hidden");
+    setTimeout(() => modal.classList.add("opacity-100", "scale-100"), 10);
+    modalImg.src = src;
+  }
+
+  function closeModal() {
+    const modal = document.getElementById("imageModal");
+    modal.classList.remove("opacity-100", "scale-100");
+    setTimeout(() => modal.classList.add("hidden"), 300);
+  }
+
+  // Close modal when clicking outside image
+  document.getElementById("imageModal").addEventListener("click", function(e){
+    if(e.target.id === "imageModal") closeModal();
+  });
+
+  // Toggle Description + Video
+  function toggleVideo(id) {
+    const videoDiv = document.getElementById('video-' + id);
+    const desc = document.getElementById('desc-' + id);
+
+    if(videoDiv){
+      videoDiv.classList.toggle('hidden');
+      desc.classList.remove('line-clamp-3'); // expand description
+    }
+  }
+</script>
+
+<style>
+  /* Smooth modal animation */
+  #imageModal {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  #imageModal.opacity-100 {
+    opacity: 1;
+    transform: scale(1);
+  }
+</style>

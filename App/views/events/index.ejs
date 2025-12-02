@@ -1,0 +1,84 @@
+<h2 class="text-3xl font-bold mb-8 text-gray-900 text-center">
+  All Events
+</h2>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  <% events.forEach(event => { %>
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col border border-gray-200 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl hover:border-gray-300">
+
+      <!-- Event Media -->
+      <% if(event.image){ %>
+        <img src="/uploads/images/<%= event.image %>" 
+             alt="<%= event.title %>" 
+             class="w-full h-52 object-cover transition-all duration-300 hover:scale-105">
+      <% } else if(event.video){ %>
+        <video class="w-full h-52 object-cover" controls>
+          <source src="/uploads/videos/<%= event.video %>" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      <% } else { %>
+        <div class="w-full h-52 bg-gray-200 flex items-center justify-center text-gray-500 text-lg">
+          No Media
+        </div>
+      <% } %>
+
+      <!-- Event Details -->
+      <div class="p-5 flex flex-col flex-1">
+        <!-- Title -->
+        <h5 class="text-xl font-semibold text-gray-800 mb-2 truncate">
+          <%= event.title %>
+        </h5>
+
+        <!-- Description -->
+        <p class="text-gray-600 mb-3 flex-1 line-clamp-3 text-sm">
+          <%= event.description %>
+        </p>
+
+        <!-- Extra Information -->
+        <div class="space-y-1 mb-3">
+          <p class="text-gray-700 text-sm">
+            <strong>Start:</strong> <%= new Date(event.startAt).toLocaleString() %>
+          </p>
+          <p class="text-gray-700 text-sm">
+            <strong>End:</strong> <%= new Date(event.endAt).toLocaleString() %>
+          </p>
+
+          <% if(event.organizerName){ %>
+            <p class="text-gray-700 text-sm">
+              <strong>Organized by:</strong> <span class="text-gray-800"><%= event.organizerName %></span>
+            </p>
+          <% } %>
+
+          <% if(event.location){ %>
+            <p class="text-gray-700 text-sm">
+              <strong>Location:</strong> <span class="text-gray-800"><%= event.location %></span>
+            </p>
+          <% } %>
+        </div>
+
+        <!-- Call to Action -->
+        <% if(user && user.role === 'user'){ %>
+          <form action="/events/<%= event._id %>/interested" method="POST" class="mt-auto">
+            <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full shadow transition-all duration-300">
+              Book Ticket
+            </button>
+          </form>
+        <% } else if(!user) { %>
+          <p class="mt-auto text-sm text-gray-600 text-center">
+            <a href="/login" class="text-blue-600 hover:underline font-medium">
+              Login to Mark Interest
+            </a>
+          </p>
+        <% } %>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<!-- Tailwind plugin for line clamp -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    plugins: [window.tailwindcssLineClamp],
+  };
+</script>

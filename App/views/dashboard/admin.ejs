@@ -1,0 +1,94 @@
+<h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Admin Dashboard</h2>
+
+<h4 class="text-xl font-semibold mb-4 text-gray-700">All Events</h4>
+
+<div class="overflow-x-auto rounded-lg shadow">
+  <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
+    <thead class="bg-gray-800 text-white sticky top-0">
+      <tr>
+        <th class="px-4 py-2 text-left">Image</th>
+        <th class="px-4 py-2 text-left">Title</th>
+        <th class="px-4 py-2 text-left">Owner</th>
+        <th class="px-4 py-2 text-left">Interested Users</th>
+        <th class="px-4 py-2 text-left">Start At</th>
+        <th class="px-4 py-2 text-left">End At</th>
+        <th class="px-4 py-2 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% events.forEach(event => { %>
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-4 py-2">
+            <% if(event.image) { %>
+              <img 
+                src="/uploads/images/<%= event.image %>" 
+                alt="<%= event.title %>" 
+                class="w-32 h-32 object-cover rounded cursor-pointer"
+                onclick="openModal('<%= event.image %>')"
+              >
+            <% } else { %>
+              <span class="text-gray-500 text-xs">No Image</span>
+            <% } %>
+          </td>
+          <td class="px-4 py-2"><%= event.title %></td>
+          <td class="px-4 py-2"><%= event.owner.name %></td>
+          <td class="px-4 py-2">
+            <% if(event.interested.length) { %>
+              <ul class="space-y-1">
+                <% event.interested.forEach(user => { %>
+                  <li class="flex items-center justify-between">
+                    <span><%= user.name %> (<%= user.email %>)</span>
+                    <% if(user.role !== 'admin' && (locals.user?.role === 'admin' || event.owner._id.toString() === locals.user?._id)) { %>
+                      <form method="POST" action="/events/<%= event._id %>/unmark/<%= user._id %>" class="inline">
+                        <input type="hidden" name="email" value="<%= user.email %>">
+                        <button class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-2 py-1 rounded">
+                          Remove
+                        </button>
+                      </form>
+                    <% } %>
+                  </li>
+                <% }) %>
+              </ul>
+            <% } else { %>
+              <span class="text-gray-500">None</span>
+            <% } %>
+          </td>
+          <td class="px-4 py-2"><%= new Date(event.startAt).toLocaleString() %></td>
+          <td class="px-4 py-2"><%= new Date(event.endAt).toLocaleString() %></td>
+          <td class="px-4 py-2 space-x-2">
+            <% if(locals.user?.role === 'admin' || event.owner._id.toString() === locals.user?._id) { %>
+              <a href="/events/<%= event._id %>/edit" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold px-2 py-1 rounded">Edit</a>
+              <form method="POST" action="/events/<%= event._id %>?_method=DELETE" class="inline">
+                <button class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-2 py-1 rounded">Delete</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<a href="/events" class="mt-4 inline-block bg-gray-500 hover:bg-gray-600 text-white font-medium px-4 py-2 rounded">
+  Back to All Events
+</a>
+
+<!-- Full Image Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+  <span class="absolute top-4 right-6 text-white text-3xl cursor-pointer" onclick="closeModal()">&times;</span>
+  <img id="modalImg" src="" class="max-h-full max-w-full rounded shadow-lg">
+</div>
+
+<script>
+  function openModal(image) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    modalImg.src = '/uploads/images/' + image;
+    modal.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.add('hidden');
+  }
+</script>
