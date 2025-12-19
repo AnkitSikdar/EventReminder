@@ -43,9 +43,18 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'App', 'views'));
 app.set('layout', 'layouts/main'); 
 
+// Redirect root to events
+app.get('/', (req, res) => {
+  res.redirect('/events');
+});
+
+// Auth routes (DO NOT CHANGE)
 app.use('/', require('./App/routes/authRoutes'));
+
+// Feature routes
 app.use('/events', require('./App/routes/eventRoutes'));
 app.use('/dashboard', require('./App/routes/dashboardRoutes'));
+
 
 cronJob.start();
 
